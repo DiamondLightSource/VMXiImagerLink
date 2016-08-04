@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Config xmlns="http://www.oppf.ox.ac.uk/xsd/RI/Config.xsd">
+    <LoggerConfig>Extensions\\OPPFlogger.xml</LoggerConfig>
+    <WebDir>C:\\Imager\\Web\\%date%\\%plateid%\\</WebDir>
+    <ArchiveDir>C:\\Imager\\Archive\\%date%\\%plateid%\\</ArchiveDir>
+    <XmlDir>C:\\Imager\\XML\\</XmlDir>
+</Config>

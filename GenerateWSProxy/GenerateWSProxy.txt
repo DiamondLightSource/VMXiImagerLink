@@ -1,0 +1,1 @@
+"C:\Program Files\Microsoft Visual Studio .NET 2003\SDK\v1.1\Bin\wsdl.exe" /language:CS /namespace:OPPFImagerLink.OPPF.Proxies /nologo http://localhost:8080/axis2/services/WSPlate?wsdl

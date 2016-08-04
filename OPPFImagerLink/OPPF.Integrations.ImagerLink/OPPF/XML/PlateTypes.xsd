@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema id="ImageInfo" targetNamespace="http://www.oppf.ox.ac.uk/xsd/RI/PlateTypes.xsd"
+	elementFormDefault="qualified" xmlns="http://www.oppf.ox.ac.uk/xsd/RI/PlateTypes.xsd" xmlns:mstns="http://www.oppf.ox.ac.uk/xsd/RI/PlateTypes.xsd"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+
+  <xs:complexType name="PlateType">
+    <!-- xs:sequence -->
+      <xs:attribute name="ID" type="xs:string" form="unqualified" use="required">
+        <xs:annotation>
+          <xs:documentation>
+              The ID of the PlateType
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Name" type="xs:string" form="unqualified" use="required">
+        <xs:annotation>
+          <xs:documentation>
+              The name of the PlateType
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NumRows" type="xs:int" form="unqualified" use="required">
+        <xs:annotation>
+          <xs:documentation>
+              The number of rows for the PlateType
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NumColumns" type="xs:int" form="unqualified" use="required">
+        <xs:annotation>
+          <xs:documentation>
+              The number of columns for the PlateType
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="NumDrops" type="xs:int" form="unqualified" use="required">
+        <xs:annotation>
+          <xs:documentation>
+              The number of drops in each well for the PlateType
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    <!-- /xs:sequence -->
+  </xs:complexType>
+  <xs:complexType name="PlateTypes">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="PlateType" type="mstns:PlateType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="PlateType" type="mstns:PlateType" />
+  <xs:element name="PlateTypes" type="mstns:PlateTypes" />
+</xs:schema>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- OPPF-UK / STRUBI Plate Types -->
+<!-- Created 2015/10/05 Jon Diprose -->
+<PlateTypes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.oppf.ox.ac.uk/xsd/RI/PlateTypes.xsd">
+  <PlateType ID="1" Name="Greiner, central shelf only" NumRows="8" NumColumns="12" NumDrops="1" />
+  <PlateType ID="2" Name="OPPF Full Greiner, all three shelves" NumRows="8" NumColumns="12" NumDrops="3" />
+  <PlateType ID="3" Name="Fluidigm 1.96" NumRows="8" NumColumns="12" NumDrops="1" />
+  <PlateType ID="4" Name="Fluidigm 4.96" NumRows="8" NumColumns="12" NumDrops="4" />
+  <PlateType ID="5" Name="Fluidigm 8.96" NumRows="8" NumColumns="12" NumDrops="8" />
+  <PlateType ID="6" Name="Fluidigm DC10 1.96" NumRows="8" NumColumns="12" NumDrops="2" />
+  <PlateType ID="7" Name="Greiner DC" NumRows="8" NumColumns="12" NumDrops="1" />
+  <PlateType ID="8" Name="STRUBI Capillary Plates" NumRows="8" NumColumns="12" NumDrops="1" />
+  <PlateType ID="9" Name="Zurich Capillary Plates" NumRows="16" NumColumns="3" NumDrops="19" />
+  <PlateType ID="10" Name="MRC" NumRows="8" NumColumns="12" NumDrops="2" />
+  <PlateType ID="11" Name="Swissci 3-well, all 3 shelves" NumRows="8" NumColumns="12" NumDrops="3" />
+  <PlateType ID="12" Name="MiTeGen In Situ-1" NumRows="8" NumColumns="12" NumDrops="1" />
+</PlateTypes>
