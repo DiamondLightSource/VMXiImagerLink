@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Config xmlns="http://www.oppf.ox.ac.uk/xsd/RI/Config.xsd">
-    <LoggerConfig>Extensions\\OPPFlogger.xml</LoggerConfig>
-    <WebDir>C:\\Imager\\Web\\%date%\\%plateid%\\</WebDir>
-    <ArchiveDir>C:\\Imager\\Archive\\%date%\\%plateid%\\</ArchiveDir>
-    <XmlDir>C:\\Imager\\XML\\</XmlDir>
-  <DoneDir>C:\\Temp\\RockImager</DoneDir>
-  <!--
-  <WsPlateEndpoint>http://localhost:8080/xtalpims-ws/services/WSPlate.WSPlateSOAP11port_http/</WsPlateEndpoint>
-  <Username>changeMe</Username>
-  <Password>changeMe</Password>
-  <DbConnectionString>driver={PostgreSQL Unicode};Server=changeMe.ac.uk;Database=changeMe;UID=changeMe;PWD=changeMe;</DbConnectionString>
-  <DbQueryString>select dttoimage AT TIME ZONE 'UTC', dtimaged AT TIME ZONE 'UTC', intpriority, intstate from tblschedules where strbarcode = ?</DbQueryString>
-   -->
-  <!-- -->
-  <WsPlateEndpoint>http://172.22.20.9:8080/xtalpims-ws/services/WSPlate.WSPlateSOAP11port_http/</WsPlateEndpoint>
-  <Username>changeMe</Username>
-  <Password>changeMe</Password>
-  <ImageBaseUrl>http://www.oppf.rc-harwell.ac.uk/images/</ImageBaseUrl>
-  <DbConnectionString>driver={PostgreSQL Unicode};Server=changeMe.ac.uk;Database=changeMe;UID=changeMe;PWD=changeMe;</DbConnectionString>
+    <LoggerConfig>C:\\ProgramData\\Formulatrix\\RockImagerProcessor\\1\\Extensions\\OPPFlogger.xml</LoggerConfig>
+	<!--
+    <WebDir>S:\\Science\\VMXi\\FormulatrixImages\\Web\\%date%\\%plateid%\\</WebDir>
+    -->
+	<!--
+	<WebDir>S:\\Science\\VMXi\\FormulatrixImages\\Web\\images\\%plateid%\\</WebDir>
+    <ArchiveDir>S:\\Science\\VMXi\\FormulatrixImages\\Archive\\%date%\\%plateid%\\</ArchiveDir>
+    <XmlDir>S:\\Science\\VMXi\\Imager\\XML\\</XmlDir>
+	-->
+  <WebDir>Z:\\.ispyb\\fmlx\\Web\\%plateid%\\</WebDir>
+  <ArchiveDir>Z:\\.ispyb\\fmlx\\Archive\\%date%\\%plateid%\\</ArchiveDir>
+  <XmlDir>S:\\</XmlDir>
+  <DoneDir>S:\\</DoneDir>
+  <WsPlateEndpoint>http://cs04r-sc-vserv-49/</WsPlateEndpoint>
+  <Username>u6KzZVhRS5NGzhhv</Username>
+  <Password>PomwD2VG9CN16xzE</Password>
+  <ImageBaseUrl>http://xtalpims.diamond.ac.uk/.ispyb/fmlx/Web/</ImageBaseUrl>
+  <DbConnectionString>driver={PostgreSQL Unicode(x64)};Server=172.23.146.154;Database=pims;UID=pimsupdate;PWD=d26LS10!;</DbConnectionString>
   <DbQueryString>select s.SCHEDULEDTIME AT TIME ZONE 'UTC' as dttoimage, s.COMPLETIONTIME AT TIME ZONE 'UTC' as dtimaged, s.PRIORITY as intpriority, s.STATE as intstate, s1.DETAILS as details from SCHE_SCHEDULEDTASK s inner join CORE_LABBOOKENTRY s1 on s.LabBookEntryID=s1.DBID inner join HOLD_ABSTRACTHOLDER ah on s.HOLDERID=ah.LABBOOKENTRYID where ah.NAME=? order by s.SCHEDULEDTIME</DbQueryString>
   <!-- -->
 </Config>
