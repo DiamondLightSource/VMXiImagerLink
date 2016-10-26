@@ -68,12 +68,12 @@ namespace OPPF.Integrations.ImagerLink.Scheduling
 
             // Get Logger.
             _log = LogManager.GetLogger(this.GetType());
-
+            //throw new Exception("Database name is " + OPPFConfigXML.GetDbConnectionString());
 			// Log the call to the constructor
 			_log.Debug("Constructed a new " + this);
 
 			// Connect to DB
-			connectToDB();
+			//connectToDB();
 
             System.Net.ServicePointManager.Expect100Continue = false;
 
@@ -303,7 +303,7 @@ namespace OPPF.Integrations.ImagerLink.Scheduling
 			// Ensure connected to database - may throw an exception but we don't need/want to catch it
 			if ((null == _dbConnection) || (System.Data.ConnectionState.Closed.Equals(_dbConnection.State)))
 			{
-				connectToDB();
+				//connectToDB();
 			}
 
 			// Try and read the imaging tasks from the db

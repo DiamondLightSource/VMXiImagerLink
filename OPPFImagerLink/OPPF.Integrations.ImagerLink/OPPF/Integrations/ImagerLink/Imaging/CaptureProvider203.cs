@@ -48,10 +48,9 @@ namespace OPPF.Integrations.ImagerLink.Imaging
             // Selectable capture profiles
             // TODO: Shift to DB
             List<IProperty> profiles = new List<IProperty>(3);
-            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("OPPF Vis", "1"));
-            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("OPPF UV", "2"));
-            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("OPPF Teach 1", "3"));
-            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("OPPF Teach 1-Full", "4"));
+
+            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("Visible 9.0 Mp", "1"));
+            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("UV Mid 9.0 Mp", "2"));
             SetCaptureProfiles(profiles);
         }
 	
