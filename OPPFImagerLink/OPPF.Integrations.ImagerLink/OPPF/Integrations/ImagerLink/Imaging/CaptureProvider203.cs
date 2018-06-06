@@ -49,7 +49,7 @@ namespace OPPF.Integrations.ImagerLink.Imaging
             // TODO: Shift to DB
             List<IProperty> profiles = new List<IProperty>(3);
 
-            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("Visible 9.0 Mp", "1"));
+            profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("VISIBLE 9.0 MP", "1"));
             profiles.Add(new global::OPPF.Integrations.ImagerLink.Property("UV Mid 9.0 Mp", "2"));
             SetCaptureProfiles(profiles);
         }
