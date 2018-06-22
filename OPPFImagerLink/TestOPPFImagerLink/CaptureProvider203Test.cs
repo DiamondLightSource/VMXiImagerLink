@@ -108,5 +108,22 @@ namespace TestOPPFImagerLink
             Assert.IsInstanceOfType(target, typeof(ICaptureProfiles));
             Assert.IsInstanceOfType(target, typeof(CaptureProvider));
         }
+
+        /// <summary>
+        /// Literally just a way to force a call into GetCapturePoints, as normally this would only happen from inside RockImager
+        /// </summary>
+        [TestMethod()]
+        [DeploymentItem("PlateTypes.xml")]
+        public void CaptureProviderTest()
+        {
+            CaptureProvider cp = new CaptureProvider();
+            //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("id", "name"), "34899", "174", false, 0);
+            //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-011", "388-20180531-143759", false, 0);
+            //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-011", "421-20180607-151500", false, 0);
+            cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-011", "700-20180531-143759", false, 0);
+        }
+
+
+
     }
 }

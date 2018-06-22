@@ -28,6 +28,7 @@ namespace OPPF.Utilities
         private static readonly string DEFAULT_IMAGE_BASE_URL = "http://localhost/images/";
         private static readonly string DEFAULT_DB_CONNECTION_STRING = "";
         private static readonly string DEFAULT_DB_QUERY_STRING = "select s.SCHEDULEDTIME AT TIME ZONE 'UTC' as dttoimage, s.COMPLETIONTIME AT TIME ZONE 'UTC' as dtimaged, s.PRIORITY as intpriority, s.STATE as intstate, s1.DETAILS as details from SCHE_SCHEDULEDTASK s inner join CORE_LABBOOKENTRY s1 on s.LabBookEntryID=s1.DBID inner join HOLD_ABSTRACTHOLDER ah on s.HOLDERID=ah.LABBOOKENTRYID where ah.NAME=? order by s.SCHEDULEDTIME";
+        private static readonly string DEFAULT_LIGHTPATH_ENDPOINT = "http://cs04r-sc-vserv-49/imaging/inspection?iid=";
         
         /// <summary>
         /// Singleton instance of OPPFConfigXML
@@ -144,6 +145,15 @@ namespace OPPF.Utilities
         }
 
         /// <summary>
+        /// Get the lightpath endpoint string
+        /// </summary>
+        /// <returns>The lightpath endpoint</returns>
+        public static string GetLightpathEndpoint()
+        {
+            return instance.LightPathEndpoint;
+        }
+
+        /// <summary>
         /// Track whether dispose has been called
         /// </summary>
         private bool disposed = false;
@@ -214,6 +224,11 @@ namespace OPPF.Utilities
         private string _dbQueryString;
 
         /// <summary>
+        /// The lightpath endpoint
+        /// </summary>
+        private string _lightpathEndpoint;
+
+        /// <summary>
         /// FileSystemWatcher to watch the config file
         /// </summary>
         private FileSystemWatcher watcher = null;
@@ -235,6 +250,7 @@ namespace OPPF.Utilities
             //this.LoggerConfig = DEFAULT_LOGGER_CONFIG;
             this.DbConnectionString = DEFAULT_DB_CONNECTION_STRING;
             this.DbQueryString = DEFAULT_DB_QUERY_STRING;
+            this.LightPathEndpoint = DEFAULT_LIGHTPATH_ENDPOINT;
 
             Environment.SetEnvironmentVariable("__OPPF_IMAGERLINK_EXTDIR", CONFIG_FILE_PATH);
             Environment.SetEnvironmentVariable("__OPPF_IMAGERLINK_LOGDIR", Path.Combine(CONFIG_FILE_PATH, Path.Combine("..", "LogFiles")));
@@ -553,6 +569,29 @@ namespace OPPF.Utilities
         }
 
         /// <summary>
+        /// The db query string
+        /// </summary>
+        string LightPathEndpoint
+        {
+            get
+            {
+                return _lightpathEndpoint;
+            }
+
+            set
+            {
+                if ((null == value) || ("".Equals(value.Trim())))
+                {
+                    _lightpathEndpoint = "";
+                }
+                else
+                {
+                    _lightpathEndpoint = value.Trim();
+                }
+            }
+        }
+
+        /// <summary>
         /// Read the config file
         /// </summary>
         private void ReadConfig()
@@ -580,6 +619,7 @@ namespace OPPF.Utilities
                     this.ImageBaseUrl = _config.ImageBaseUrl;
                     this.DbConnectionString = _config.DbConnectionString;
                     this.DbQueryString = _config.DbQueryString;
+                    this.LightPathEndpoint = _config.LightPathEndpoint;
 
                     // Log the new configuration
                     ILog log = LogManager.GetLogger(this.GetType());
@@ -661,6 +701,7 @@ namespace OPPF.Utilities
                 "\"; Password=\"" + "********" +
                 "\"; LoggerConfig=\"" + this.LoggerConfig +
                 "\"; ImageBaseUrl=\"" + this.ImageBaseUrl +
+                "\"; LightPathEndpoint=\"" + this.LightPathEndpoint +
                 "\"]");
         }
 
@@ -692,6 +733,7 @@ namespace OPPF.Utilities
                 _password = null;
                 _loggerConfig = null;
                 _imageBaseUrl = null;
+                _lightpathEndpoint = null;
 
                 disposed = true;
             }

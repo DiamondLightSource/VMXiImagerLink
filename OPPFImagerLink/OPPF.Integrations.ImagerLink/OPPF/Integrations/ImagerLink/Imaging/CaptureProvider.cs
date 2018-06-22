@@ -6,6 +6,8 @@
 using Formulatrix.Integrations.ImagerLink;
 using Formulatrix.Integrations.ImagerLink.Imaging;
 using log4net;
+using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace OPPF.Integrations.ImagerLink.Imaging
 {
@@ -22,6 +24,8 @@ namespace OPPF.Integrations.ImagerLink.Imaging
 	/// </remarks>
 	public class CaptureProvider : ICaptureProvider
 	{
+        // MXSW-704
+        private IPlateInfoProvider _pip;
 
         /// <summary>
         /// The logger.
@@ -49,6 +53,8 @@ namespace OPPF.Integrations.ImagerLink.Imaging
             // Log the call to the constructor
             _log.Debug("Constructed a new " + this);
 
+            // Allows us to get the plate type information
+            _pip = new PlateInfoProviderNew();
         }
 	
 		#region ICaptureProvider Members
@@ -97,6 +103,14 @@ namespace OPPF.Integrations.ImagerLink.Imaging
 
             CapturePointList capturePointList = null;
 
+            // If 0 then it is a scheduled imaging, need to find the inspection type (light path)
+            if(userSelectionCaptureProfileID == 0)
+            {
+                userSelectionCaptureProfileID = GetLightPathForScheduledImaging(imagingID);
+            }
+
+            IPlateType plateType = _pip.GetPlateType(robot, _pip.GetPlateInfo(robot, plateID).PlateTypeID);
+
             // OPPF Vis
             if (1 == userSelectionCaptureProfileID)
             {
@@ -121,15 +135,31 @@ namespace OPPF.Integrations.ImagerLink.Imaging
                 // Create the array of capture profiles to be used for each drop - in this case only one
                 CaptureProfile[] captureProfiles = new CaptureProfile[1];
                 captureProfiles[0] = captureProfile;
+                
+                // Get number of wells and drops from plate type
+                int plateWells = plateType.NumRows * plateType.NumColumns;
+                int plateDrops = plateType.NumDrops;
+                int totalDrops = plateWells * plateDrops;
+                _log.Info("Using Plate Type: " + plateType.Name + " with Wells: " + plateWells + " Drops: " + plateDrops + " Total Drops: " + totalDrops);
 
                 // Create a CapturePoint for each drop using RockImager's default drop position and the UV LightPath 
-                // TODO: Get number of wells and drops from plate type
-                int wells = 96;
-                CapturePoint[] capturePoints = new CapturePoint[wells];
-                for (int i = 0; i < wells; i++)
+                CapturePoint[] capturePoints = new CapturePoint[totalDrops];
+                int dropCounter = 1;
+                int wellCounter = 1;
+
+                for (int i = 0; i < totalDrops; i++)
                 {
-                    // TODO: Loop over drops - currently assumes one drop per well
-                    capturePoints[i] = new CapturePoint(i + 1, 1, captureProfiles, null, null, "1", RegionType.Drop);
+                    // Loop over drops - track wells and drops independantly
+                    capturePoints[i] = new CapturePoint(wellCounter, dropCounter, captureProfiles, null, null, "1", RegionType.Drop);
+                    _log.Info("CapturePoint(" + wellCounter + ", " + dropCounter + ", LightPath: 1, " + "null, null, " + "1, " + RegionType.Drop + ") registered");
+
+                    if (dropCounter == plateDrops)
+                    {
+                        dropCounter = 1;
+                        wellCounter++;
+                    }
+                    else
+                        dropCounter++;
                 }
 
                 // Create the CapturePointList and set the PlateCaptureProfile and CapturePoints
@@ -240,6 +270,39 @@ namespace OPPF.Integrations.ImagerLink.Imaging
 			dropNumber = 1;
 		}
 
+        /// <summary>
+        /// Gets inspectionTypeID (light path) from ISPyB via REST
+        /// </summary>
+        /// <param name="imagingID"></param>
+        /// <returns>integer value with a light path used by the GetCapturePoints method</returns>
+        private int GetLightPathForScheduledImaging(string imagingID)
+        {
+            // expected imagingID will be in the format containerInspectionId-YYYYMMDD-HHMMSS Only need the first part
+            string containerInspectionId = imagingID.Substring(0, imagingID.IndexOf("-", 0, imagingID.Length));
+            string url = Utilities.OPPFConfigXML.GetLightpathEndpoint() + containerInspectionId;
+            int lightPath = 0;
+            WebClient client = new WebClient();
+
+            try
+            {
+                _log.Info("Calling URL: " + url);
+                string inspectionType = client.DownloadString(url);
+                JObject obj = JObject.Parse(inspectionType);
+                lightPath = int.Parse((string)obj.GetValue("INSPECTIONTYPEID"));
+                _log.Info("Got light path: " + lightPath + " for imagingID: " + imagingID);
+            }
+            catch (WebException e)
+            {
+                _log.Error("Failed to find imagingID: " + imagingID + " " + e.Message);
+            }
+            catch (Newtonsoft.Json.JsonReaderException jre)
+            {
+                _log.Error("Failed to parse JSON for imagingID: " + imagingID + " " + jre.Message);
+            }
+
+            return lightPath;
+        }
+
         /*
          * Added in Formulatrix.Integrations.ImagerLink.dll v2.0.0.73 (RockImager v2.0.3.18),
          * which is supposed to be more recent than v2.0.1.136 (RockImager v2.0.1.136), and
@@ -264,31 +327,31 @@ namespace OPPF.Integrations.ImagerLink.Imaging
          * 
          */
 
-        #endregion
+                #endregion
 
-        #region Set methods for interface properties
+                #region Set methods for interface properties
 
-        /*
-         * Added for the CaptureProfiles ICaptureProfile property that was subsequently relocated.
-         * 
-        /// <summary>
-        /// Set the current set of capture profiles for imaging with selectable capture profile feature.
-        /// </summary>
-        /// <param name="captureProfiles"></param>
-        public void SetCaptureProfiles(System.Collections.Generic.List<IProperty> captureProfiles)
-        {
-            if (null == captureProfiles)
-            {
-                _captureProfiles = new System.Collections.Generic.List<IProperty>(0);
-            }
-            else
-            {
-                _captureProfiles = captureProfiles;
+                /*
+                 * Added for the CaptureProfiles ICaptureProfile property that was subsequently relocated.
+                 * 
+                /// <summary>
+                /// Set the current set of capture profiles for imaging with selectable capture profile feature.
+                /// </summary>
+                /// <param name="captureProfiles"></param>
+                public void SetCaptureProfiles(System.Collections.Generic.List<IProperty> captureProfiles)
+                {
+                    if (null == captureProfiles)
+                    {
+                        _captureProfiles = new System.Collections.Generic.List<IProperty>(0);
+                    }
+                    else
+                    {
+                        _captureProfiles = captureProfiles;
+                    }
+                }
+                */
+
+                #endregion
+
             }
         }
-        */
-
-        #endregion
-
-    }
-}

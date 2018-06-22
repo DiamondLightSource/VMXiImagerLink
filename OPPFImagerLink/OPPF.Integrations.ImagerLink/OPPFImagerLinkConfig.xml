@@ -13,11 +13,12 @@
   <ArchiveDir>Z:\\.ispyb\\fmlx\\Archive\\%date%\\%plateid%\\</ArchiveDir>
   <XmlDir>S:\\</XmlDir>
   <DoneDir>S:\\</DoneDir>
-  <WsPlateEndpoint>http://cs04r-sc-vserv-49/</WsPlateEndpoint>
+  <WsPlateEndpoint>http://cs04r-sc-vserv-49/formulatrix/</WsPlateEndpoint>
   <Username>u6KzZVhRS5NGzhhv</Username>
   <Password>PomwD2VG9CN16xzE</Password>
   <ImageBaseUrl>http://xtalpims.diamond.ac.uk/.ispyb/fmlx/Web/</ImageBaseUrl>
   <DbConnectionString>driver={PostgreSQL Unicode(x64)};Server=172.23.146.154;Database=pims;UID=pimsupdate;PWD=d26LS10!;</DbConnectionString>
   <DbQueryString>select s.SCHEDULEDTIME AT TIME ZONE 'UTC' as dttoimage, s.COMPLETIONTIME AT TIME ZONE 'UTC' as dtimaged, s.PRIORITY as intpriority, s.STATE as intstate, s1.DETAILS as details from SCHE_SCHEDULEDTASK s inner join CORE_LABBOOKENTRY s1 on s.LabBookEntryID=s1.DBID inner join HOLD_ABSTRACTHOLDER ah on s.HOLDERID=ah.LABBOOKENTRYID where ah.NAME=? order by s.SCHEDULEDTIME</DbQueryString>
+  <LightPathEndpoint>http://cs04r-sc-vserv-49/imaging/inspection?iid=</LightPathEndpoint>
   <!-- -->
 </Config>

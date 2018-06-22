@@ -79,7 +79,7 @@ namespace OPPF.Integrations.ImagerLink.Scheduling
 			_log.Debug("Constructed a new " + this);
 
 			// Connect to DB
-			connectToDB();
+			//connectToDB();
 
 		}
 
@@ -290,7 +290,7 @@ namespace OPPF.Integrations.ImagerLink.Scheduling
 			// Ensure connected to database - may throw an exception but we don't need/want to catch it
 			if (System.Data.ConnectionState.Closed.Equals(_platedbConnection.State))
 			{
-				connectToDB();
+				//connectToDB();
 			}
 
 			// Try and read the imaging tasks from the db
