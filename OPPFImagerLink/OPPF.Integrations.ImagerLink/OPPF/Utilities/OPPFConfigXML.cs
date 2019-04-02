@@ -29,7 +29,8 @@ namespace OPPF.Utilities
         private static readonly string DEFAULT_DB_CONNECTION_STRING = "";
         private static readonly string DEFAULT_DB_QUERY_STRING = "select s.SCHEDULEDTIME AT TIME ZONE 'UTC' as dttoimage, s.COMPLETIONTIME AT TIME ZONE 'UTC' as dtimaged, s.PRIORITY as intpriority, s.STATE as intstate, s1.DETAILS as details from SCHE_SCHEDULEDTASK s inner join CORE_LABBOOKENTRY s1 on s.LabBookEntryID=s1.DBID inner join HOLD_ABSTRACTHOLDER ah on s.HOLDERID=ah.LABBOOKENTRYID where ah.NAME=? order by s.SCHEDULEDTIME";
         private static readonly string DEFAULT_LIGHTPATH_ENDPOINT = "http://cs04r-sc-vserv-49/imaging/inspection?iid=";
-        
+        private static readonly string DEFAULT_SAMPLELOCATION_ENDPOINT = "http://ws156.diamond.ac.uk:8080/api/imaging/inspection/locations/";
+
         /// <summary>
         /// Singleton instance of OPPFConfigXML
         /// </summary>
@@ -154,6 +155,15 @@ namespace OPPF.Utilities
         }
 
         /// <summary>
+        /// Get the lightpath endpoint string
+        /// </summary>
+        /// <returns>The lightpath endpoint</returns>
+        public static string GetSampleLocationEndpoint()
+        {
+            return instance.SampleLocationEndpoint;
+        }
+
+        /// <summary>
         /// Track whether dispose has been called
         /// </summary>
         private bool disposed = false;
@@ -229,6 +239,11 @@ namespace OPPF.Utilities
         private string _lightpathEndpoint;
 
         /// <summary>
+        /// The sample location endpoint
+        /// </summary>
+        private string _samplelocationEndpoint;
+
+        /// <summary>
         /// FileSystemWatcher to watch the config file
         /// </summary>
         private FileSystemWatcher watcher = null;
@@ -251,6 +266,7 @@ namespace OPPF.Utilities
             this.DbConnectionString = DEFAULT_DB_CONNECTION_STRING;
             this.DbQueryString = DEFAULT_DB_QUERY_STRING;
             this.LightPathEndpoint = DEFAULT_LIGHTPATH_ENDPOINT;
+            this.SampleLocationEndpoint = DEFAULT_SAMPLELOCATION_ENDPOINT;
 
             Environment.SetEnvironmentVariable("__OPPF_IMAGERLINK_EXTDIR", CONFIG_FILE_PATH);
             Environment.SetEnvironmentVariable("__OPPF_IMAGERLINK_LOGDIR", Path.Combine(CONFIG_FILE_PATH, Path.Combine("..", "LogFiles")));
@@ -569,7 +585,7 @@ namespace OPPF.Utilities
         }
 
         /// <summary>
-        /// The db query string
+        /// Light path endpoint url
         /// </summary>
         string LightPathEndpoint
         {
@@ -587,6 +603,29 @@ namespace OPPF.Utilities
                 else
                 {
                     _lightpathEndpoint = value.Trim();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sample location endpoint url
+        /// </summary>
+        string SampleLocationEndpoint
+        {
+            get
+            {
+                return _samplelocationEndpoint;
+            }
+
+            set
+            {
+                if ((null == value) || ("".Equals(value.Trim())))
+                {
+                    _samplelocationEndpoint = "";
+                }
+                else
+                {
+                    _samplelocationEndpoint = value.Trim();
                 }
             }
         }
@@ -620,6 +659,7 @@ namespace OPPF.Utilities
                     this.DbConnectionString = _config.DbConnectionString;
                     this.DbQueryString = _config.DbQueryString;
                     this.LightPathEndpoint = _config.LightPathEndpoint;
+                    this.SampleLocationEndpoint = _config.SampleLocationEndpoint;
 
                     // Log the new configuration
                     ILog log = LogManager.GetLogger(this.GetType());

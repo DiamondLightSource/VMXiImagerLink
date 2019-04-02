@@ -17,7 +17,8 @@
       <xs:element name="ImageBaseUrl" type="xs:string" />
       <xs:element name="DbConnectionString" type="xs:string" />
       <xs:element name="DbQueryString" type="xs:string" />
-	  <xs:element name="LightPathEndpoint" type="xs:string" />
+	    <xs:element name="LightPathEndpoint" type="xs:string" />
+      <xs:element name="SampleLocationEndpoint" type="xs:string"/>
     </xs:all>
 	</xs:complexType>
 </xs:schema>

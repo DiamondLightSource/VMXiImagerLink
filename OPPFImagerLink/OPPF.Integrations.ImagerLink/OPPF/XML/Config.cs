@@ -47,6 +47,8 @@ namespace OPPF.XML {
         private string dbQueryStringField;
         
         private string lightPathEndpointField;
+
+        private string sampleLocationEndpointField;
         
         /// <remarks/>
         public string LoggerConfig {
@@ -165,6 +167,19 @@ namespace OPPF.XML {
             }
             set {
                 this.lightPathEndpointField = value;
+            }
+        }
+
+        /// <remarks/>
+        public string SampleLocationEndpoint
+        {
+            get
+            {
+                return this.sampleLocationEndpointField;
+            }
+            set
+            {
+                this.sampleLocationEndpointField = value;
             }
         }
     }

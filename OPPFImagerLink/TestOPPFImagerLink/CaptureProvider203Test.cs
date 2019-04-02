@@ -120,10 +120,19 @@ namespace TestOPPFImagerLink
             //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("id", "name"), "34899", "174", false, 0);
             //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-011", "388-20180531-143759", false, 0);
             //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-011", "421-20180607-151500", false, 0);
-            cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-011", "700-20180531-143759", false, 0);
+            //cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-016", "641-20181114-153400", false, 0);
+            cp.GetCapturePoints(new OPPF.Integrations.ImagerLink.Robot("3", "RI1000-0000"), "VMXiSim-016", "735-20181114-153400", false, 0);
         }
 
-
+        [TestMethod()]
+        public void LocationsTest()
+        {
+            CaptureProvider cp = new CaptureProvider();
+            PrivateObject obj = new PrivateObject(cp);
+            string[] args = { "VMXiSim-016" };
+            int[] locations = (int[])obj.Invoke("GetSampleLocations", args);
+            System.Console.WriteLine(locations);
+        }
 
     }
 }

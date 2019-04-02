@@ -8,6 +8,7 @@ using Formulatrix.Integrations.ImagerLink.Imaging;
 using log4net;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Linq;
 
 namespace OPPF.Integrations.ImagerLink.Imaging
 {
@@ -108,14 +109,19 @@ namespace OPPF.Integrations.ImagerLink.Imaging
             {
                 userSelectionCaptureProfileID = GetLightPathForScheduledImaging(imagingID);
             }
-
+            
             IPlateType plateType = _pip.GetPlateType(robot, _pip.GetPlateInfo(robot, plateID).PlateTypeID);
+            
+            int[] sampleLocations = GetSampleLocations(plateID);
 
             // OPPF Vis
             if (1 == userSelectionCaptureProfileID)
             {
-                _log.Info("Returning empty ICapturePointList");
+                _log.Info("Returning ICapturePointList with CapturePoints for specific drops to be imaged, with a null ICaptureProfile (Should assume visible LightPath)");
                 capturePointList = new CapturePointList();
+
+                CapturePoint[] capturePoints = GetCapturePointsDetails(sampleLocations, plateType, null);
+                capturePointList.SetCapturePoints(capturePoints);
             }
 
             // OPPF UV
@@ -135,32 +141,9 @@ namespace OPPF.Integrations.ImagerLink.Imaging
                 // Create the array of capture profiles to be used for each drop - in this case only one
                 CaptureProfile[] captureProfiles = new CaptureProfile[1];
                 captureProfiles[0] = captureProfile;
-                
-                // Get number of wells and drops from plate type
-                int plateWells = plateType.NumRows * plateType.NumColumns;
-                int plateDrops = plateType.NumDrops;
-                int totalDrops = plateWells * plateDrops;
-                _log.Info("Using Plate Type: " + plateType.Name + " with Wells: " + plateWells + " Drops: " + plateDrops + " Total Drops: " + totalDrops);
 
-                // Create a CapturePoint for each drop using RockImager's default drop position and the UV LightPath 
-                CapturePoint[] capturePoints = new CapturePoint[totalDrops];
-                int dropCounter = 1;
-                int wellCounter = 1;
-
-                for (int i = 0; i < totalDrops; i++)
-                {
-                    // Loop over drops - track wells and drops independantly
-                    capturePoints[i] = new CapturePoint(wellCounter, dropCounter, captureProfiles, null, null, "1", RegionType.Drop);
-                    _log.Info("CapturePoint(" + wellCounter + ", " + dropCounter + ", LightPath: 1, " + "null, null, " + "1, " + RegionType.Drop + ") registered");
-
-                    if (dropCounter == plateDrops)
-                    {
-                        dropCounter = 1;
-                        wellCounter++;
-                    }
-                    else
-                        dropCounter++;
-                }
+                // Get specific well and drop numbers to be imaged
+                CapturePoint[] capturePoints = GetCapturePointsDetails(sampleLocations, plateType, captureProfiles);
 
                 // Create the CapturePointList and set the PlateCaptureProfile and CapturePoints
                 // NB I don't think RockImager actually uses the PlateCaptureProfile
@@ -237,7 +220,6 @@ namespace OPPF.Integrations.ImagerLink.Imaging
                 capturePointList.SetCapturePoints(capturePoints);
             }
 
-
             return capturePointList;
         }
 
@@ -301,6 +283,121 @@ namespace OPPF.Integrations.ImagerLink.Imaging
             }
 
             return lightPath;
+        }
+
+        /// <summary>
+        /// Gets array of drop numbers to be imaged from ISPyB via REST
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns>integer array used by the GetCapturePoints and GetCapturePointsDetails methods</returns>
+        private int[] GetSampleLocations(string barcode)
+        {
+            string url = Utilities.OPPFConfigXML.GetSampleLocationEndpoint() + barcode;
+            WebClient client = new WebClient();
+            int[] locations = null;
+
+            try
+            {
+                _log.Info("Calling URL: " + url);
+                string response = client.DownloadString(url);
+                JArray obj = JArray.Parse(response);
+
+                locations = new int[obj.Count];
+                int count = 0;
+
+                foreach(JObject location in obj)
+                {
+                    locations[count] = int.Parse((string)location.GetValue("LOCATION"));
+                    count++;
+                }
+                _log.Info("Got locations: [" + string.Join(",",locations.Select(x => x.ToString()).ToArray()) + "] for plateID: " + barcode);
+            }
+            catch(WebException e)
+            {
+                _log.Error("Failed to find barcode: " + barcode + " " + e.Message);
+            }
+            return locations;
+        }
+
+        /// <summary>
+        /// Returns specific drop locations to be imaged along with light path info as an array of CapturePoint objects
+        /// </summary>
+        /// <param name="sampleLocations"></param>
+        /// <param name="plateType"></param>
+        /// <param name="captureProfiles"></param>
+        /// <returns>CapturePoint array used by the GetCapturePoints method</returns>
+        private CapturePoint[] GetCapturePointsDetails(int[] sampleLocations, IPlateType plateType, CaptureProfile[] captureProfiles)
+        {
+            CapturePoint[] capturePoints = null;
+
+            int plateWells = plateType.NumRows * plateType.NumColumns;
+            int plateDrops = plateType.NumDrops;
+            int totalDrops = plateWells * plateDrops;
+
+            // If there are specific drops we only want to image those (there should be really, even if it's every drop)
+            if (sampleLocations != null && sampleLocations.Length > 0)
+            {
+                _log.Info("Received " + sampleLocations.Length + " locations, registering CapturePoints...");
+                capturePoints = new CapturePoint[sampleLocations.Length];
+                
+                for (int i = 0; i < sampleLocations.Length; i++)
+                {
+                    // ISPyB only stores drop numbers from the point view of 'total drops' e.g. 1-192 for a 96 well 2 drop plate
+                    // Therefore we need to figure out which specific well number and drop number to pass to RockImager e.g. well 2 drop 1
+                    int location = sampleLocations[i];
+                    int div = location / plateDrops;
+                    int mod = location % plateDrops;
+                    int well = 0;
+                    int drop = 0;
+
+                    switch (plateDrops)
+                    {
+                        case 1:
+                            well = location;
+                            drop = 1;
+                            break;
+                        default:
+                            if (mod == 0)
+                            {
+                                well = div;
+                                drop = plateDrops;
+                            }
+                            else
+                            {
+                                well = ++div;
+                                drop = mod;
+                            }
+                            break;
+                    }
+                    capturePoints[i] = new CapturePoint(well, drop, captureProfiles, null, null, "1", RegionType.Drop);
+                    _log.Info("CapturePoint(" + well + ", " + drop + ", " + ((captureProfiles != null) && (captureProfiles[0].Properties[0].Value).Equals("1") ? "UV," : "Visible,") + " null, null, " + "1, " + RegionType.Drop + ") registered");
+                }
+            }
+            // In theory we should never reach here because there should always be specified sample locations (even if it's every drop) but as a safe catch all we can image every drop (probably on error)
+            else
+            {
+                _log.Error("No sample locations received! Registering CapturePoints for all drops...");
+                capturePoints = new CapturePoint[totalDrops];
+                int dropCounter = 1;
+                int wellCounter = 1;
+
+                for (int i = 0; i < totalDrops; i++)
+                {
+                    // Loop over drops - track wells and drops independantly
+                    capturePoints[i] = new CapturePoint(wellCounter, dropCounter, captureProfiles, null, null, "1", RegionType.Drop);
+                    _log.Info("CapturePoint(" + wellCounter + ", " + dropCounter + ", " + ((captureProfiles != null) && (captureProfiles[0].Properties[0].Value).Equals("1") ? "UV," : "Visible,") + " null, null, " + "1, " + RegionType.Drop + ") registered");
+
+                    if (dropCounter == plateDrops)
+                    {
+                        dropCounter = 1;
+                        wellCounter++;
+                    }
+                    else
+                        dropCounter++;
+                }
+            }
+
+            return capturePoints;
         }
 
         /*
